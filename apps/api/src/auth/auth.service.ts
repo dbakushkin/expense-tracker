@@ -31,10 +31,8 @@ export class AuthService {
 
   async login(dto: LoginDto): Promise<AuthResponse> {
     const rawUser = await this.queryBus.execute(new GetUserByEmailQuery(dto.email));
-    if (!rawUser) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-    const passwordValid = await bcrypt.compare(dto.password, rawUser.passwordHash);
+    const passwordValid =
+      rawUser != null && (await bcrypt.compare(dto.password, rawUser.passwordHash));
     if (!passwordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
