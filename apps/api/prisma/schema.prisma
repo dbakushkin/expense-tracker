@@ -1,0 +1,13 @@
+// Prisma schema for @expence-tracker/api
+// Документация: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Модели (User, Expense, Category, ...) добавим в следующих итерациях.
