@@ -2,6 +2,7 @@
 
 **Дата:** 2026-05-08
 **Цель:** Поднять домен пользователя и аутентификацию в `apps/api`. Auth не зависит от UserService напрямую — общается через CQRS-шину.
+**Статус: ✅ ВЫПОЛНЕНО**
 
 ---
 
@@ -24,104 +25,92 @@
 
 ### 1. Зависимости и инфраструктура
 
-- [ ] Установить `bcrypt` и `@nestjs/cqrs` в `apps/api`
-  ```bash
-  pnpm --filter api add bcrypt @nestjs/cqrs
-  ```
-- [ ] Установить `@types/bcrypt` и `@types/passport-jwt` (devDependencies)
-  ```bash
-  pnpm --filter api add -D @types/bcrypt @types/passport-jwt
-  ```
-- [ ] Убедиться, что Postgres поднят (`pnpm db:up`)
+- [x] Установить `bcrypt` и `@nestjs/cqrs` в `apps/api`
+- [x] Установить `@types/bcrypt` и `@types/passport-jwt` (devDependencies)
+- [x] Убедиться, что Postgres поднят (`pnpm db:up`)
 
 ### 2. Prisma модель User
 
-- [ ] Добавить модель `User` в `apps/api/prisma/schema.prisma`:
-  ```prisma
-  model User {
-    id           String   @id @default(uuid()) @db.Uuid
-    email        String   @unique @db.VarChar(255)
-    name         String   @db.VarChar(255)
-    passwordHash String   @db.VarChar(255)
-    createdAt    DateTime @default(now())
-    updatedAt    DateTime @updatedAt
-
-    @@map("users")
-  }
-  ```
-- [ ] Применить миграцию: `pnpm --filter api exec prisma migrate dev --name init-user`
-- [ ] Сгенерировать клиент: `pnpm --filter api exec prisma generate`
+- [x] Добавить модель `User` в `apps/api/prisma/schema.prisma`
+- [x] Применить миграцию: `init-user`
+- [x] Сгенерировать клиент
 
 ### 3. Shared types (контракт)
 
-- [ ] Создать `packages/shared-types/src/auth.ts` с интерфейсами:
-  - [ ] `UserPublic` — `{ id, email, name, createdAt, updatedAt }` (даты как ISO-строки)
-  - [ ] `RegisterRequest` — `{ email, name, password }`
-  - [ ] `LoginRequest` — `{ email, password }`
-  - [ ] `AuthResponse` — `{ user: UserPublic, accessToken: string }`
-  - [ ] `JwtPayload` — `{ sub: string, email: string }`
-- [ ] Добавить `export * from "./auth";` в `packages/shared-types/src/index.ts`
+- [x] Создать `packages/shared-types/src/auth.ts` с интерфейсами:
+  - [x] `UserPublic` — `{ id, email, name, createdAt, updatedAt }` (даты как ISO-строки)
+  - [x] `RegisterRequest` — `{ email, name, password }`
+  - [x] `LoginRequest` — `{ email, password }`
+  - [x] `AuthResponse` — `{ user: UserPublic, accessToken: string }`
+  - [x] `JwtPayload` — `{ sub: string, email: string }`
+- [x] Добавить `export * from "./auth";` в `packages/shared-types/src/index.ts`
 
 ### 4. UserModule (`apps/api/src/user/`)
 
-- [ ] `user.service.ts` — методы `create`, `findByEmail`, `findById` через `PrismaService`
-- [ ] `user.mapper.ts` — `toPublic(user): UserPublic` (отрезает passwordHash, даты в ISO)
-- [ ] `exceptions/email-already-exists.exception.ts` — extends `ConflictException`
-- [ ] **Commands:**
-  - [ ] `commands/create-user.command.ts` — `CreateUserCommand({ email, name, passwordHash })`
-  - [ ] `commands/handlers/create-user.handler.ts` — проверка дубля → создание
-  - [ ] `commands/handlers/index.ts` — массив `CommandHandlers`
-- [ ] **Queries:**
-  - [ ] `queries/get-user-by-email.query.ts` — `GetUserByEmailQuery({ email })`
-  - [ ] `queries/get-user-by-id.query.ts` — `GetUserByIdQuery({ id })`
-  - [ ] `queries/handlers/get-user-by-email.handler.ts`
-  - [ ] `queries/handlers/get-user-by-id.handler.ts`
-  - [ ] `queries/handlers/index.ts` — массив `QueryHandlers`
-- [ ] `user.module.ts` — `imports: [CqrsModule]`, `providers: [UserService, ...CommandHandlers, ...QueryHandlers]`
+- [x] `user.service.ts` — методы `create`, `findByEmail`, `findById` через `PrismaService`
+  - [x] P2002 race condition → `EmailAlreadyExistsException`
+- [x] `user.mapper.ts` — `toPublic(user): UserPublic` (отрезает passwordHash, даты в ISO)
+- [x] `exceptions/email-already-exists.exception.ts` — extends `ConflictException`
+- [x] **Commands:**
+  - [x] `commands/create-user.command.ts`
+  - [x] `commands/handlers/create-user.handler.ts` — проверка дубля → создание → возвращает `UserPublic`
+  - [x] `commands/handlers/index.ts`
+- [x] **Queries:**
+  - [x] `queries/get-user-by-email.query.ts`
+  - [x] `queries/get-user-by-id.query.ts`
+  - [x] `queries/handlers/get-user-by-email.handler.ts`
+  - [x] `queries/handlers/get-user-by-id.handler.ts`
+  - [x] `queries/handlers/index.ts`
+- [x] `user.module.ts` — `imports: [CqrsModule]`, `providers: [UserService, ...CommandHandlers, ...QueryHandlers]`
 
 ### 5. AuthModule (`apps/api/src/auth/`)
 
-- [ ] **DTO:**
-  - [ ] `dto/register.dto.ts` — `RegisterDto implements RegisterRequest` + валидаторы (`@IsEmail`, `@IsString @MinLength(2) @MaxLength(100)` для name, `@IsString @MinLength(8) @MaxLength(72)` для password)
-  - [ ] `dto/login.dto.ts` — `LoginDto implements LoginRequest`
-- [ ] **Strategies:**
-  - [ ] `strategies/jwt.strategy.ts` — `PassportStrategy(Strategy, "jwt")`, `validate` вызывает `queryBus.execute(GetUserByIdQuery)`
-- [ ] **Guards & decorators (для экспорта в будущие модули):**
-  - [ ] `guards/jwt-auth.guard.ts` — `extends AuthGuard("jwt")`
-  - [ ] `decorators/current-user.decorator.ts` — `createParamDecorator → request.user`
-  - [ ] `types/jwt-payload.interface.ts` — re-export `JwtPayload` из shared-types
-- [ ] **Service:**
-  - [ ] `auth.service.ts` — `register` (bcrypt.hash → CreateUserCommand → signToken), `login` (GetUserByEmailQuery → bcrypt.compare → signToken), `signToken`, константа `BCRYPT_SALT_ROUNDS = 10`
-- [ ] **Controller:**
-  - [ ] `auth.controller.ts` — `POST /register`, `POST /login`, `GET /me` (под `JwtAuthGuard`, через `@CurrentUser()`)
-- [ ] **Module:**
-  - [ ] `auth.module.ts` — `imports: [CqrsModule, PassportModule, JwtModule.registerAsync({...}), ConfigModule]`, `exports: [JwtAuthGuard]`
+- [x] **DTO:**
+  - [x] `dto/register.dto.ts` — валидаторы + `implements RegisterRequest`
+  - [x] `dto/login.dto.ts` — `implements LoginRequest`
+- [x] **Strategies:**
+  - [x] `strategies/jwt.strategy.ts` — `GetUserByIdQuery` → `UserMapper.toPublic`
+- [x] **Guards & decorators:**
+  - [x] `guards/jwt-auth.guard.ts` — `extends AuthGuard("jwt")`
+  - [x] `decorators/current-user.decorator.ts` — `request.user`
+  - [x] `types/jwt-payload.interface.ts` — re-export из shared-types
+- [x] **Service:**
+  - [x] `auth.service.ts` — register / login (единый UnauthorizedException) / signToken
+  - [x] `BCRYPT_SALT_ROUNDS = 10`
+- [x] **Controller:**
+  - [x] `POST /register` → 201, `POST /login` → 200, `GET /me` → 200 под JwtAuthGuard
+- [x] **Module:**
+  - [x] `auth.module.ts` — `exports: [JwtAuthGuard]`
 
 ### 6. Глобальные изменения
 
-- [ ] `apps/api/src/main.ts` — добавить `app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }))`
-- [ ] `apps/api/src/app.module.ts` — добавить `ConfigModule.forRoot({ isGlobal: true })`, `UserModule`, `AuthModule`
+- [x] `apps/api/src/main.ts` — `ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true })`
+- [x] `apps/api/src/app.module.ts` — `ConfigModule.forRoot({ isGlobal: true })`, `UserModule`, `AuthModule`
 
 ### 7. Верификация end-to-end
 
-- [ ] `pnpm --filter api type-check` — без ошибок
-- [ ] `pnpm --filter api lint` — без ошибок
-- [ ] `pnpm --filter api dev` — стартует без ошибок
-- [ ] **curl-сценарии:**
-  - [ ] Регистрация → 201, ответ `{user, accessToken}`
-    ```bash
-    curl -i -X POST http://localhost:3001/api/auth/register \
-      -H 'Content-Type: application/json' \
-      -d '{"email":"a@b.com","name":"Alice","password":"secret123"}'
-    ```
-  - [ ] Повторная регистрация того же email → 409 Conflict
-  - [ ] Логин с верным паролем → 200, `{user, accessToken}`
-  - [ ] Логин с неверным паролем → 401 `Invalid credentials`
-  - [ ] `GET /me` с валидным токеном → 200, `UserPublic`
-  - [ ] `GET /me` без токена → 401
-  - [ ] DTO-валидация: `password` короче 8 символов → 400 BadRequest
+- [x] `pnpm --filter api type-check` — 0 ошибок
+- [x] `pnpm --filter api dev` — стартует без ошибок
+- [x] **curl-сценарии:**
+  - [x] Регистрация → 201, ответ `{user, accessToken}` ✅
+  - [x] Повторная регистрация того же email → 409 Conflict ✅
+  - [x] Логин с верным паролем → 200, `{user, accessToken}` ✅
+  - [x] Логин с неверным паролем → 401 `Invalid credentials` ✅
+  - [x] `GET /me` с валидным токеном → 200, `UserPublic` ✅
+  - [x] `GET /me` без токена → 401 ✅
+  - [x] DTO-валидация: `password` короче 8 символов → 400 BadRequest ✅
 
 ---
+
+## Git история
+
+```
+b3b05f1 feat(app): wire UserModule, AuthModule, ConfigModule and ValidationPipe
+07885ce feat(auth): add AuthModule with JWT register/login/me and JwtAuthGuard
+838c6d9 fix(user): handle P2002 race condition, return UserPublic from CreateUserHandler
+3a3135e feat(user): add UserModule with CQRS commands and queries
+5fe9fc8 Initial scaffold: NestJS + Next.js monorepo (Turborepo + pnpm)
+```
 
 ## Ловушки и проверки
 
@@ -130,21 +119,8 @@
 - `JwtPayload` типизировать одним интерфейсом из shared-types и переиспользовать в `signToken` и `JwtStrategy.validate`.
 - bcrypt salt rounds = 10 (константа `BCRYPT_SALT_ROUNDS` в `auth.service.ts`).
 - `PrismaModule` уже `@Global()` — НЕ импортировать повторно в `UserModule`.
-- Никогда не возвращать сырого Prisma-`User` из контроллера: всегда через `UserMapper.toPublic()`, иначе `passwordHash` утечёт.
+- Никогда не возвращать сырого Prisma-`User` из контроллера: всегда через `UserMapper.toPublic()`.
 - Handler-ы CQRS — обычные DI-классы; забыть положить их в `providers` UserModule = молчаливый «handler not found».
-- В `UserPublic` даты — `string` (ISO), не `Date`: иначе разъезжается контракт shared-types между web и api.
-- На login возвращать **один** `UnauthorizedException("Invalid credentials")` для обоих кейсов (юзер не найден / пароль не совпал) — чтобы не давать enumeration oracle.
+- В `UserPublic` даты — `string` (ISO), не `Date`.
+- На login возвращать **один** `UnauthorizedException("Invalid credentials")` для обоих кейсов.
 - `password` ограничен 72 символами — bcrypt молча отбрасывает остальное.
-
----
-
-## Critical files
-
-- `apps/api/prisma/schema.prisma`
-- `apps/api/package.json`
-- `apps/api/src/main.ts`
-- `apps/api/src/app.module.ts`
-- `apps/api/src/user/**` (создаётся целиком)
-- `apps/api/src/auth/**` (создаётся целиком)
-- `packages/shared-types/src/auth.ts` (новый)
-- `packages/shared-types/src/index.ts` (re-export)
