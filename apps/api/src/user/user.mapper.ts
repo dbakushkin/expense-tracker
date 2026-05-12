@@ -1,5 +1,5 @@
-import { User } from '@prisma/client';
-import { UserPublic } from '@expence-tracker/shared-types';
+import type { User } from '@prisma/client';
+import type { UserPublic } from '@expence-tracker/shared-types';
 
 export class UserMapper {
   static toPublic(user: User): UserPublic {
