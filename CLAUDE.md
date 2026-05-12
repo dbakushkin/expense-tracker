@@ -61,24 +61,24 @@ API запускается на `http://localhost:3001/api`, фронт — на
 
 ### Frontend: Feature Slice Design (FSD)
 
-Фронтенд (`apps/web`) організований за [Feature Slice Design](https://feature-sliced.design/).
+Фронтенд (`apps/web`) организован по [Feature Slice Design](https://feature-sliced.design/).
 
-**Слої (від верхнього до нижнього — кожний слой імпортує лише з шарів нижче):**
+**Слои (от верхнего к нижнему — каждый слой импортирует только из слоёв ниже):**
 
-| Слой | Шлях | Зміст |
-|------|------|-------|
-| `app` | `src/app/` | Next.js App Router: тільки `page.tsx`, `layout.tsx`, Route Handlers |
-| `pages` | `src/pages/` | Server Components сторінок, реекспортують віджети |
-| `widgets` | `src/widgets/` | Складові UI-блоки (форми, секції) — Client Components |
-| `features` | `src/features/` | Бізнес-логіка: zod-схеми, API-клієнт, хуки |
-| `entities` | `src/entities/` | Доменні типи (re-export із shared-types) |
-| `shared` | `src/shared/` | UI-компоненти (shadcn), env-конфіг, fetch-хелпер |
+| Слой | Путь | Содержимое |
+|------|------|-----------|
+| `app` | `src/app/` | Next.js App Router: только `page.tsx`, `layout.tsx`, Route Handlers |
+| `views` | `src/views/` | Server Components страниц, реэкспортируют виджеты (переименовано из `pages/` — Next.js резервирует это имя для Pages Router) |
+| `widgets` | `src/widgets/` | Составные UI-блоки (формы, секции) — Client Components |
+| `features` | `src/features/` | Бизнес-логика: zod-схемы, API-клиент, хуки |
+| `entities` | `src/entities/` | Доменные типы (re-export из shared-types) |
+| `shared` | `src/shared/` | UI-компоненты (shadcn), env-конфиг, fetch-хелпер |
 
 **Правила:**
-- `app/` містить лише роутинг і Route Handlers — ніякої бізнес-логіки. Route Handlers можуть імпортувати з `shared/` (прагматичний виняток FSD — вони є server-side і не мають аналога в `pages/`).
-- Слайс публікує API лише через `index.ts` — не імпортувати з внутрішніх шляхів.
-- `shared/ui/` — shadcn/ui компоненти, встановлюються через `pnpm dlx shadcn@latest add <name>`.
-- Новий функціональний блок: додати feature-слайс у `src/features/<name>/`, віджет у `src/widgets/<name>/`, сторінку у `src/pages/<name>/`.
+- `app/` содержит только роутинг и Route Handlers — никакой бизнес-логики. Route Handlers могут импортировать из `shared/` (прагматическое исключение FSD — они являются server-side и не имеют аналога в `pages/`).
+- Слайс публикует API только через `index.ts` — не импортировать из внутренних путей.
+- `shared/ui/` — shadcn/ui компоненты, устанавливаются через `pnpm dlx shadcn@latest add <name>`.
+- Новый функциональный блок: добавить feature-слайс в `src/features/<name>/`, виджет в `src/widgets/<name>/`, страницу в `src/views/<name>/`.
 
 ### Аутентификация
 
