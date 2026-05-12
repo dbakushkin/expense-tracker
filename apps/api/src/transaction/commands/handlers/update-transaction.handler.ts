@@ -21,9 +21,9 @@ export class UpdateTransactionHandler implements ICommandHandler<UpdateTransacti
     const data: Record<string, unknown> = {};
     if (cmd.data.amount !== undefined) data['amount'] = cmd.data.amount;
     if (cmd.data.type !== undefined) data['type'] = cmd.data.type.toUpperCase() as TransactionType;
-    if ('description' in cmd.data) data['description'] = cmd.data.description;
+    if (cmd.data.description !== undefined) data['description'] = cmd.data.description;
     if (cmd.data.date !== undefined) data['date'] = new Date(cmd.data.date);
-    if ('categoryId' in cmd.data) data['categoryId'] = cmd.data.categoryId;
+    if (cmd.data.categoryId !== undefined) data['categoryId'] = cmd.data.categoryId;
 
     const transaction = await this.service.update(cmd.id, cmd.userId, data as Parameters<TransactionService['update']>[2]);
     return TransactionMapper.toPublic(transaction);
