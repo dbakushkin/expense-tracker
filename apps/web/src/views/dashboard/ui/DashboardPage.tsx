@@ -1,29 +1,46 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { nestFetch } from '@/shared/api/client';
-import { LogoutButton } from '@/widgets/auth-form';
+import { AppHeader } from '@/widgets/app-header';
+import { RecentTransactions } from '@/widgets/recent-transactions';
 import type { UserPublic } from '@/entities/user';
+import type { TransactionListResponse } from '@/entities/transaction';
 
-export async function DashboardPage() {
+const PAGE_SIZE = 10;
+
+interface DashboardPageProps {
+  searchParams?: { page?: string };
+}
+
+export async function DashboardPage({ searchParams }: DashboardPageProps) {
   const token = cookies().get('access_token')?.value;
   if (!token) redirect('/login');
 
-  const res = await nestFetch('/auth/me', {
-    headers: { Authorization: `Bearer ${token}` },
-    cache: 'no-store',
-  });
+  const requestedPage = Number(searchParams?.page ?? '1');
+  const page = Number.isFinite(requestedPage) && requestedPage > 0 ? Math.floor(requestedPage) : 1;
 
-  if (!res.ok) redirect('/login');
+  const auth = { Authorization: `Bearer ${token}` };
 
-  const user = await res.json() as UserPublic;
+  const [userRes, listRes] = await Promise.all([
+    nestFetch('/auth/me', { headers: auth, cache: 'no-store' }),
+    nestFetch(`/transactions?page=${page}&limit=${PAGE_SIZE}`, { headers: auth, cache: 'no-store' }),
+  ]);
+
+  if (!userRes.ok || !listRes.ok) redirect('/login');
+
+  const user = await userRes.json() as UserPublic;
+  const list = await listRes.json() as TransactionListResponse;
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-8">
-      <div className="text-center space-y-4">
-        <h1 className="text-2xl font-bold">Привет, {user.name}!</h1>
-        <p className="text-sm text-muted-foreground">{user.email}</p>
-        <LogoutButton />
-      </div>
-    </main>
+    <div className="min-h-screen bg-background">
+      <AppHeader user={user} />
+      <main className="container mx-auto space-y-6 px-4 py-8">
+        <section>
+          <h1 className="text-2xl font-bold">Привет, {user.name}!</h1>
+          <p className="text-sm text-muted-foreground">{user.email}</p>
+        </section>
+        <RecentTransactions initialData={list} />
+      </main>
+    </div>
   );
 }
