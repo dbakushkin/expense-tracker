@@ -97,6 +97,39 @@ JWT выдаётся NestJS, фронт хранит его в **httpOnly cookie
 - ESLint и tsconfig **расширяются** из shared-пакетов, а не дублируются. Если нужно правило для всего репо — кладите в `packages/eslint-config/base.js`; правило только для одного приложения — в его `.eslintrc.cjs`.
 - Корневой `package.json` помечен `private: true`. Любой новый внутренний пакет именуется `@expence-tracker/<name>` и тоже `private: true`.
 
+## Соглашение о коммитах
+
+Формат: `<type>(<scope>): <description>`
+
+**Типы:**
+
+| Тип | Когда использовать |
+|-----|--------------------|
+| `feat` | Новая функциональность |
+| `fix` | Исправление бага |
+| `refactor` | Рефакторинг без изменения поведения |
+| `docs` | Документация (CLAUDE.md, комментарии) |
+| `chore` | Конфиги, зависимости, CI — без кода продукта |
+| `test` | Добавление или правка тестов |
+| `perf` | Оптимизация производительности |
+
+**Scopes:** `api`, `web`, `shared-types`, `prisma`, `docker` — имя пакета или слоя.
+
+**Правила:**
+- `description` — в нижнем регистре, без точки в конце, на английском языке.
+- Тело коммита (через пустую строку) — объясняет **почему**, если причина неочевидна из заголовка.
+- Один коммит = одна логическая единица изменений. Не смешивать feat и refactor в одном коммите.
+- Breaking change: добавить `!` после scope (`feat(api)!:`) и описать в теле.
+
+**Примеры:**
+```
+feat(api): add TransactionModule with CQRS and monthly aggregation
+fix(web): validate JWT before dashboard redirect
+refactor(web): rename FSD layer pages → views
+docs: translate CLAUDE.md to Russian
+chore: expand Claude Code allowed commands in local settings
+```
+
 ## Что отложено
 
 - Тестовый стек на фронте (Vitest или Jest) — выбрать при добавлении первых тестов.
