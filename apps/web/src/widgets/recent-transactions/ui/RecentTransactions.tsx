@@ -41,6 +41,10 @@ export function RecentTransactions({ initialData }: RecentTransactionsProps) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setData(initialData);
+  }, [initialData]);
+
+  useEffect(() => {
     if (urlPage === data.meta.page) return;
     let cancelled = false;
     setLoading(true);

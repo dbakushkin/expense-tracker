@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { nestFetch } from '@/shared/api/client';
 import { AppHeader } from '@/widgets/app-header';
 import { RecentTransactions } from '@/widgets/recent-transactions';
+import { CreateTransactionDialog } from '@/widgets/transaction-form';
 import type { UserPublic } from '@/entities/user';
 import type { TransactionListResponse } from '@/entities/transaction';
 
@@ -35,9 +36,12 @@ export async function DashboardPage({ searchParams }: DashboardPageProps) {
     <div className="min-h-screen bg-background">
       <AppHeader user={user} />
       <main className="container mx-auto space-y-6 px-4 py-8">
-        <section>
-          <h1 className="text-2xl font-bold">Привет, {user.name}!</h1>
-          <p className="text-sm text-muted-foreground">{user.email}</p>
+        <section className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold">Привет, {user.name}!</h1>
+            <p className="text-sm text-muted-foreground">{user.email}</p>
+          </div>
+          <CreateTransactionDialog />
         </section>
         <RecentTransactions initialData={list} />
       </main>
