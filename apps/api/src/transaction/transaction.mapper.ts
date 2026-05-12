@@ -1,5 +1,5 @@
 import type { Transaction } from '@prisma/client';
-import { Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 import type { TransactionPublic, TransactionSummary, TransactionType } from '@expence-tracker/shared-types';
 
 export class TransactionMapper {
