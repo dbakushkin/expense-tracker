@@ -75,7 +75,7 @@ API запускается на `http://localhost:3001/api`, фронт — на
 | `shared` | `src/shared/` | UI-компоненти (shadcn), env-конфіг, fetch-хелпер |
 
 **Правила:**
-- `app/` містить лише роутинг і Route Handlers — ніякої бізнес-логіки.
+- `app/` містить лише роутинг і Route Handlers — ніякої бізнес-логіки. Route Handlers можуть імпортувати з `shared/` (прагматичний виняток FSD — вони є server-side і не мають аналога в `pages/`).
 - Слайс публікує API лише через `index.ts` — не імпортувати з внутрішніх шляхів.
 - `shared/ui/` — shadcn/ui компоненти, встановлюються через `pnpm dlx shadcn@latest add <name>`.
 - Новий функціональний блок: додати feature-слайс у `src/features/<name>/`, віджет у `src/widgets/<name>/`, сторінку у `src/pages/<name>/`.
