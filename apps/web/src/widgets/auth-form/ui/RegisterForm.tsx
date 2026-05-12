@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/shared/ui/button';
+import { Checkbox } from '@/shared/ui/checkbox';
 import { Input } from '@/shared/ui/input';
 import {
   Form,
@@ -25,7 +26,7 @@ export function RegisterForm() {
 
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { email: '', name: '', password: '' },
+    defaultValues: { email: '', name: '', password: '', termsAccepted: false as unknown as true },
   });
 
   async function onSubmit(values: RegisterFormValues) {
@@ -91,6 +92,38 @@ export function RegisterForm() {
                   <FormControl>
                     <Input type="password" placeholder="Минимум 8 символов" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="termsAccepted"
+              render={({ field }) => (
+                <FormItem className="flex flex-col gap-1">
+                  <div className="flex items-start gap-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        id="termsAccepted"
+                        className="mt-0.5"
+                      />
+                    </FormControl>
+                    <label
+                      htmlFor="termsAccepted"
+                      className="text-sm leading-snug text-muted-foreground cursor-pointer select-none"
+                    >
+                      Согласен с{' '}
+                      <Link href="/legal/terms" className="text-foreground underline underline-offset-4">
+                        пользовательским соглашением
+                      </Link>{' '}
+                      и{' '}
+                      <Link href="/legal/privacy" className="text-foreground underline underline-offset-4">
+                        политикой обработки данных
+                      </Link>
+                    </label>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}

@@ -4,7 +4,7 @@
   "private": true,
   "description": "Expense tracker web (Next.js)",
   "scripts": {
-    "dev": "next dev -p 3000",
+    "dev": "next dev -p 3000 -H 0.0.0.0",
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "next lint",
@@ -15,10 +15,12 @@
   "dependencies": {
     "@expence-tracker/shared-types": "workspace:*",
     "@hookform/resolvers": "^5.2.2",
+    "@radix-ui/react-checkbox": "^1.3.3",
     "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "lucide-react": "^1.14.0",
     "next": "^14",
     "react": "^18",
     "react-dom": "^18",
