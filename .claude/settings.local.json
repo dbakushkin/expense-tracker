@@ -7,7 +7,26 @@
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(node *)",
-      "Bash(git init *)"
+      "Bash(git init *)",
+      "Bash(curl -s -w '\\\\nHTTP:%{http_code}' -X POST http://localhost:3001/api/auth/register -H 'Content-Type: application/json' -d '{\"email\":\"a@b.com\",\"name\":\"Alice\",\"password\":\"secret123\"}')",
+      "Bash(curl -s -w '\\\\nHTTP:%{http_code}' -X POST http://localhost:3001/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"a@b.com\",\"password\":\"secret123\"}')",
+      "Bash(curl -s -w '\\\\nHTTP:%{http_code}' -X POST http://localhost:3001/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"a@b.com\",\"password\":\"wrong\"}')",
+      "Bash(curl -s -w '\\\\nHTTP:%{http_code}' http://localhost:3001/api/auth/me -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhOTljMDlhOC00ZWRhLTQ5MGYtOThkOC0zYTczMDAzYzlkYTUiLCJlbWFpbCI6ImFAYi5jb20iLCJpYXQiOjE3NzgyMzE1MjgsImV4cCI6MTc3ODgzNjMyOH0.mrUt8K3_zhrcPkLKOMrBjtSuxz7bludTsM3gE0sBNKU')",
+      "Bash(curl -s -w \"\\\\nHTTP:%{http_code}\" http://localhost:3001/api/auth/me)",
+      "Bash(git *)",
+      "Bash(bash *)",
+      "Bash(docker compose ps *)",
+      "Bash(kill 1652247)",
+      "Bash(pnpm --filter @expence-tracker/web dev)",
+      "Bash(echo \"New PID: $!\")",
+      "Bash(curl -s -o /dev/null -w \"/ → %{http_code} %{redirect_url}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"/login → %{http_code}\\\\n\" http://localhost:3000/login)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(echo \"PID: $!\")",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/login)",
+      "Bash(curl -s -X DELETE http://localhost:3001/api/transactions/bd0b8685-6135-4a72-b116-6a958322099c -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkNWY2NjlmOS05ZjE2LTQ4MDItYmZlNC1hOGYwYzY1NjAwMmMiLCJlbWFpbCI6ImFsaWNlQHRlc3QuY29tIiwiaWF0IjoxNzc4NTkwMTM1LCJleHAiOjE3NzkxOTQ5MzV9.dWL6hBm78uT07ZJ-zyXiEsGkJQDbZ38bHTXpBSsZuDM' -o /dev/null -w '%{http_code}')",
+      "Bash(curl -s -X DELETE http://localhost:3001/api/transactions/bd0b8685-6135-4a72-b116-6a958322099c -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkNWY2NjlmOS05ZjE2LTQ4MDItYmZlNC1hOGYwYzY1NjAwMmMiLCJlbWFpbCI6ImFsaWNlQHRlc3QuY29tIiwiaWF0IjoxNzc4NTkwMTM1LCJleHAiOjE3NzkxOTQ5MzV9.dWL6hBm78uT07ZJ-zyXiEsGkJQDbZ38bHTXpBSsZuDM')"
     ]
   }
 }
