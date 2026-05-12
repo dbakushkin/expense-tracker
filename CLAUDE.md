@@ -59,6 +59,27 @@ API запускается на `http://localhost:3001/api`, фронт — на
 - `@expence-tracker/eslint-config` — `base.js`, `next.js`, `nest.js`. Apps подключают через `extends: ["@expence-tracker/eslint-config/<name>"]` в `.eslintrc.cjs`.
 - `@expence-tracker/shared-types` — **только чистые TypeScript-типы** (DTO request/response, доменные интерфейсы, enum-ы валют/статусов). Запрещено импортировать сюда `@prisma/client`, NestJS, React. Экспортируется как `src/index.ts` напрямую (без сборки), `transpilePackages`/`tsconfig paths` обеспечивают видимость.
 
+### Frontend: Feature Slice Design (FSD)
+
+Фронтенд (`apps/web`) організований за [Feature Slice Design](https://feature-sliced.design/).
+
+**Слої (від верхнього до нижнього — кожний слой імпортує лише з шарів нижче):**
+
+| Слой | Шлях | Зміст |
+|------|------|-------|
+| `app` | `src/app/` | Next.js App Router: тільки `page.tsx`, `layout.tsx`, Route Handlers |
+| `pages` | `src/pages/` | Server Components сторінок, реекспортують віджети |
+| `widgets` | `src/widgets/` | Складові UI-блоки (форми, секції) — Client Components |
+| `features` | `src/features/` | Бізнес-логіка: zod-схеми, API-клієнт, хуки |
+| `entities` | `src/entities/` | Доменні типи (re-export із shared-types) |
+| `shared` | `src/shared/` | UI-компоненти (shadcn), env-конфіг, fetch-хелпер |
+
+**Правила:**
+- `app/` містить лише роутинг і Route Handlers — ніякої бізнес-логіки.
+- Слайс публікує API лише через `index.ts` — не імпортувати з внутрішніх шляхів.
+- `shared/ui/` — shadcn/ui компоненти, встановлюються через `pnpm dlx shadcn@latest add <name>`.
+- Новий функціональний блок: додати feature-слайс у `src/features/<name>/`, віджет у `src/widgets/<name>/`, сторінку у `src/pages/<name>/`.
+
 ### Аутентификация
 
 JWT выдаётся NestJS, фронт хранит его в **httpOnly cookie**. Серверные компоненты Next.js читают cookie и проксируют запросы в API. Стороннего auth-провайдера нет.
