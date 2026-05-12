@@ -4,3 +4,5 @@
 // (Prisma client, NestJS, React) — только чистые типы.
 
 export * from "./auth";
+export * from "./category";
+export * from "./transaction";
