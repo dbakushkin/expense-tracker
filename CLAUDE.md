@@ -161,6 +161,49 @@ chore: expand Claude Code allowed commands in local settings
 - Ветка живёт пока открыт PR; после мёрджа — удалить локально и удалённо.
 - Называть ветки на английском в kebab-case: `feat/home-screen`, `fix/auth-redirect`.
 
+### Pull Request
+
+**Заголовок** — строго по Conventional Commits:
+
+```
+feat(web): implement dashboard home screen with transaction management
+fix(api): handle empty body in transactions proxy route
+```
+
+**Описание** строится из `git diff origin/master...HEAD --stat` и `git log --oneline origin/master..HEAD`:
+
+```markdown
+## Что сделано
+
+### Backend (`apps/api`)
+- **`GET /api/endpoint`** — краткое описание изменения
+- **`ServiceName.methodName`** — что добавлено/изменено
+
+### Frontend (`apps/web`)
+- **`WidgetName`** — назначение компонента
+- **`features/name`** — что входит в слайс
+
+## Тесты
+- `path/to/test.ts` — что покрыто
+
+## Проверка
+- [ ] `pnpm type-check` — без ошибок
+- [ ] `pnpm lint` — без ошибок
+- [ ] Ручная проверка golden path
+```
+
+**Команда создания:**
+
+```bash
+gh pr create --title "feat(scope): description" --body "$(cat <<'EOF'
+## Что сделано
+...
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+EOF
+)"
+```
+
 ## Что отложено
 
 - Тестовый стек на фронте (Vitest или Jest) — выбрать при добавлении первых тестов.
