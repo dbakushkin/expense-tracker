@@ -24,10 +24,21 @@ export class TransactionService {
     return this.prisma.transaction.findFirst({ where: { id, userId } });
   }
 
-  findAllByUser(userId: string, range?: { gte: Date; lt: Date }): Promise<Transaction[]> {
+  findAllByUser(
+    userId: string,
+    range?: { gte: Date; lt: Date },
+    pagination?: { skip: number; take: number },
+  ): Promise<Transaction[]> {
     return this.prisma.transaction.findMany({
       where: { userId, ...(range && { date: range }) },
       orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
+      ...(pagination && { skip: pagination.skip, take: pagination.take }),
+    });
+  }
+
+  countByUser(userId: string, range?: { gte: Date; lt: Date }): Promise<number> {
+    return this.prisma.transaction.count({
+      where: { userId, ...(range && { date: range }) },
     });
   }
 

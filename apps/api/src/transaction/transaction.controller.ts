@@ -41,7 +41,9 @@ export class TransactionController {
 
   @Get()
   findAll(@CurrentUser() user: UserPublic, @Query() query: ListTransactionsQuery): Promise<TransactionListResponse> {
-    return this.queryBus.execute(new GetTransactionsByUserIdQuery(user.id, query.month, query.year));
+    return this.queryBus.execute(
+      new GetTransactionsByUserIdQuery(user.id, query.page, query.limit, query.month, query.year),
+    );
   }
 
   @Get(':id')

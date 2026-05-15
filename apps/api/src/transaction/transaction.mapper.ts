@@ -1,6 +1,6 @@
 import type { Transaction } from '@prisma/client';
 import type { Prisma } from '@prisma/client';
-import type { TransactionPublic, TransactionSummary, TransactionType } from '@expence-tracker/shared-types';
+import type { PaginationMeta, TransactionPublic, TransactionSummary, TransactionType } from '@expence-tracker/shared-types';
 
 export class TransactionMapper {
   static toPublic(t: Transaction): TransactionPublic {
@@ -22,6 +22,15 @@ export class TransactionMapper {
       income: income.toFixed(2),
       expense: expense.toFixed(2),
       balance: income.minus(expense).toFixed(2),
+    };
+  }
+
+  static toMeta(total: number, page: number, pageSize: number): PaginationMeta {
+    return {
+      total,
+      page,
+      pageSize,
+      totalPages: Math.max(1, Math.ceil(total / pageSize)),
     };
   }
 }

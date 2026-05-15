@@ -18,9 +18,17 @@ export interface TransactionSummary {
   balance: string;
 }
 
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
 export interface TransactionListResponse {
   items: TransactionPublic[];
   summary: TransactionSummary;
+  meta: PaginationMeta;
 }
 
 export interface CreateTransactionRequest {
@@ -42,4 +50,6 @@ export interface UpdateTransactionRequest {
 export interface ListTransactionsQueryParams {
   month?: number;            // 1..12
   year?: number;             // 2000..2100
+  page?: number;             // >= 1
+  limit?: number;            // 1..100
 }

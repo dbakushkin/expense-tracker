@@ -7,6 +7,7 @@ describe('registerSchema', () => {
       email: 'user@example.com',
       name: 'Иван',
       password: 'password123',
+      termsAccepted: true,
     });
     expect(result.success).toBe(true);
   });
@@ -18,7 +19,7 @@ describe('registerSchema', () => {
       password: 'password123',
     });
     expect(result.success).toBe(false);
-    expect(result.error?.issues[0].path[0]).toBe('name');
+    expect(result.error?.issues[0]?.path[0]).toBe('name');
   });
 
   it('отклоняет пароль короче 8 символов', () => {
@@ -28,7 +29,7 @@ describe('registerSchema', () => {
       password: 'short',
     });
     expect(result.success).toBe(false);
-    expect(result.error?.issues[0].path[0]).toBe('password');
+    expect(result.error?.issues[0]?.path[0]).toBe('password');
   });
 
   it('отклоняет пароль длиннее 72 символов', () => {
@@ -38,6 +39,6 @@ describe('registerSchema', () => {
       password: 'a'.repeat(73),
     });
     expect(result.success).toBe(false);
-    expect(result.error?.issues[0].path[0]).toBe('password');
+    expect(result.error?.issues[0]?.path[0]).toBe('password');
   });
 });
