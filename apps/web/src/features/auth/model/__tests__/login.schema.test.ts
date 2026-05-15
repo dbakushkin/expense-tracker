@@ -10,12 +10,12 @@ describe('loginSchema', () => {
   it('отклоняет некорректный email', () => {
     const result = loginSchema.safeParse({ email: 'not-email', password: 'secret' });
     expect(result.success).toBe(false);
-    expect(result.error?.issues[0].path[0]).toBe('email');
+    expect(result.error?.issues[0]?.path[0]).toBe('email');
   });
 
   it('отклоняет пустой пароль', () => {
     const result = loginSchema.safeParse({ email: 'user@example.com', password: '' });
     expect(result.success).toBe(false);
-    expect(result.error?.issues[0].path[0]).toBe('password');
+    expect(result.error?.issues[0]?.path[0]).toBe('password');
   });
 });
