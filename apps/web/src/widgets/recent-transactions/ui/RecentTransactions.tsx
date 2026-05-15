@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { transactionsApi } from '@/features/transactions';
 import type { TransactionListResponse } from '@/entities/transaction';
+import type { CategoryPublic } from '@/entities/category';
+import { PAGE_SIZE } from '@/shared/config/pagination';
 import {
   Card,
   CardContent,
@@ -23,13 +25,12 @@ import { cn } from '@/shared/lib/utils';
 import { formatCurrency, formatDate } from '@/shared/lib/format';
 import { PaginationControls } from './PaginationControls';
 
-const PAGE_SIZE = 10;
-
 interface RecentTransactionsProps {
   initialData: TransactionListResponse;
+  categories: CategoryPublic[];
 }
 
-export function RecentTransactions({ initialData }: RecentTransactionsProps) {
+export function RecentTransactions({ initialData, categories }: RecentTransactionsProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -39,13 +40,17 @@ export function RecentTransactions({ initialData }: RecentTransactionsProps) {
 
   const [data, setData] = useState<TransactionListResponse>(initialData);
   const [loading, setLoading] = useState(false);
+  const lastFetchedPageRef = useRef<number>(initialData.meta.page);
+
+  const categoryMap = new Map(categories.map((c) => [c.id, c]));
 
   useEffect(() => {
     setData(initialData);
   }, [initialData]);
 
   useEffect(() => {
-    if (urlPage === data.meta.page) return;
+    if (urlPage === lastFetchedPageRef.current) return;
+    lastFetchedPageRef.current = urlPage;
     let cancelled = false;
     setLoading(true);
     transactionsApi
@@ -59,7 +64,7 @@ export function RecentTransactions({ initialData }: RecentTransactionsProps) {
     return () => {
       cancelled = true;
     };
-  }, [urlPage, data.meta.page]);
+  }, [urlPage]);
 
   function handlePageChange(nextPage: number) {
     const params = new URLSearchParams(searchParams.toString());
@@ -115,7 +120,7 @@ export function RecentTransactions({ initialData }: RecentTransactionsProps) {
                   <TableCell className="whitespace-nowrap">{formatDate(tx.date)}</TableCell>
                   <TableCell>{tx.description ?? '—'}</TableCell>
                   <TableCell className="text-muted-foreground">
-                    {tx.categoryId ? <span className="font-mono text-xs">{tx.categoryId.slice(0, 8)}</span> : '—'}
+                    {tx.categoryId ? (categoryMap.get(tx.categoryId)?.name ?? '—') : '—'}
                   </TableCell>
                   <TableCell>
                     <span className={cn('text-xs font-medium', tx.type === 'income' ? 'text-emerald-600' : 'text-rose-600')}>

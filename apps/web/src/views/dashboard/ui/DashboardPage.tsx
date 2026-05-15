@@ -1,13 +1,13 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { nestFetch } from '@/shared/api/client';
+import { PAGE_SIZE } from '@/shared/config/pagination';
 import { AppHeader } from '@/widgets/app-header';
 import { RecentTransactions } from '@/widgets/recent-transactions';
 import { CreateTransactionDialog } from '@/widgets/transaction-form';
 import type { UserPublic } from '@/entities/user';
 import type { TransactionListResponse } from '@/entities/transaction';
-
-const PAGE_SIZE = 10;
+import type { CategoryPublic } from '@/entities/category';
 
 interface DashboardPageProps {
   searchParams?: { page?: string };
@@ -22,15 +22,23 @@ export async function DashboardPage({ searchParams }: DashboardPageProps) {
 
   const auth = { Authorization: `Bearer ${token}` };
 
-  const [userRes, listRes] = await Promise.all([
+  const [userRes, listRes, categoriesRes] = await Promise.all([
     nestFetch('/auth/me', { headers: auth, cache: 'no-store' }),
     nestFetch(`/transactions?page=${page}&limit=${PAGE_SIZE}`, { headers: auth, cache: 'no-store' }),
+    nestFetch('/categories', { headers: auth, cache: 'no-store' }),
   ]);
 
-  if (!userRes.ok || !listRes.ok) redirect('/login');
+  if (userRes.status === 401 || userRes.status === 403 || listRes.status === 401 || listRes.status === 403) {
+    redirect('/login');
+  }
+
+  if (!userRes.ok || !listRes.ok) {
+    throw new Error('Failed to load dashboard data');
+  }
 
   const user = await userRes.json() as UserPublic;
   const list = await listRes.json() as TransactionListResponse;
+  const categories = categoriesRes.ok ? await categoriesRes.json() as CategoryPublic[] : [];
 
   return (
     <div className="min-h-screen bg-background">
@@ -43,7 +51,7 @@ export async function DashboardPage({ searchParams }: DashboardPageProps) {
           </div>
           <CreateTransactionDialog />
         </section>
-        <RecentTransactions initialData={list} />
+        <RecentTransactions initialData={list} categories={categories} />
       </main>
     </div>
   );

@@ -28,6 +28,7 @@ export function ProfileMenu({ user }: ProfileMenuProps) {
     try {
       await authApi.logout();
     } finally {
+      setLoading(false);
       router.push('/login');
       router.refresh();
     }

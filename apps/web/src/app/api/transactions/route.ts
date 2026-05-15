@@ -29,7 +29,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  const body = await req.json() as unknown;
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ message: 'Invalid request body' }, { status: 400 });
+  }
+
   const res = await nestFetch('/transactions', {
     method: 'POST',
     headers: auth,

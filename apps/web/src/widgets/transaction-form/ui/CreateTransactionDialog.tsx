@@ -89,6 +89,7 @@ export function CreateTransactionDialog() {
     setOpen(next);
     if (!next) {
       setServerError(null);
+      setCategoriesError(null);
       form.reset({
         type: 'expense',
         amount: '',
